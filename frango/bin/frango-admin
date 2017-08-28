@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+from frango.sample import (TEMPLATE_MAIN,
+                           TEMPLATE_VIEWS,
+                           SAMPLE_KV,
+                           TEMPLATE_MODELS,
+                           TEMPLATE_SETTINGS,)
+
+def normalize_template(template_str, app_name):
+    return template_str.replace('{{app_name}}', app_name)
+
+
+def create_file_with_content(filename, content):
+    dir_path = os.path.dirname(filename)
+    #print 'path dir ', dir_path
+    if not os.path.exists(filename):
+        #print 'make dir ', filename
+        try:
+            os.makedirs (dir_path)
+        except:
+            pass
+    f = open(filename, 'w')
+    f.write(content)
+    f.close()
+    
+def start_project(app_name):
+    print "Starting project..."
+    template_list = {
+        TEMPLATE_MAIN: '{{app_name}}/main.py',
+        TEMPLATE_VIEWS: '{{app_name}}/{{app_name}}/views.py',
+        TEMPLATE_MODELS: '{{app_name}}/{{app_name}}/models.py',
+        SAMPLE_KV: '{{app_name}}/{{app_name}}/templates/sample.kv',
+        TEMPLATE_SETTINGS: '{{app_name}}/settings.py',
+        '': '{{app_name}}/{{app_name}}/__init__.py',
+        }
+    for template in template_list.keys():
+        content = normalize_template(template, app_name)
+        file_name = normalize_template(template_list[template], app_name)
+        #print file_name, content
+        create_file_with_content(file_name, content)
+
+def start_app(app_name):
+    print "Starting app..."
+    template_list = {
+        TEMPLATE_VIEWS: '{{app_name}}/views.py',
+        TEMPLATE_MODELS: '{{app_name}}/models.py',
+        SAMPLE_KV: '{{app_name}}/templates/sample.kv',
+        '': '{{app_name}}/__init__.py',
+        }
+    for template in template_list.keys():
+        content = normalize_template(template, app_name)
+        file_name = normalize_template(template_list[template], app_name)
+        #print file_name, content
+        create_file_with_content(file_name, content)
+        
+
+
+def show_help():
+    print "help text"
+
+if __name__ == '__main__':
+    if 'startproject' in sys.argv:
+        idx = sys.argv.index('startproject')
+        project_name = sys.argv[idx+1]
+        start_project(project_name)
+        
+    if 'startapp' in sys.argv:
+        idx = sys.argv.index('startapp')
+        project_name = sys.argv[idx+1]
+        start_app(project_name)
+        
+    if '--help' in sys.argv:
+        show_help()
+    if len(sys.argv) <= 1:
+        show_help()
+
+
